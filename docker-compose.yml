@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  php:
+    build: ./docker/php
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+    ports:
+      - 80:80
