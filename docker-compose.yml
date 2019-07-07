@@ -7,3 +7,16 @@ services:
       - ./docker/php/config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
     ports:
       - 80:80
+  db:
+    image: mysql:5.7.26
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+    command: --innodb_use_native_aio=0
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+  pma:
+     image: phpmyadmin/phpmyadmin:4.9
+     ports:
+       - 8080:80
