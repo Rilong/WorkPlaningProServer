@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
+use Laravel\Passport\Token;
 
 class AuthController extends Controller
 {
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $http = new \GuzzleHttp\Client();
 
         try {
@@ -22,10 +25,44 @@ class AuthController extends Controller
             return $response->getBody();
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             if ($e->getCode() == 400) {
-                return response()->json(['message' => 'Your request are invalid. Please enter a username or a password'], $e->getCode());
+                return response()->json(['error' => 'Your request are invalid. Please enter a username or a password'], $e->getCode());
             } elseif ($e->getCode() == 401) {
-                return response()->json(['message' => 'Your credentials are incorrect. Please try again'], $e->getCode());
+                return response()->json(['error' => 'Your credentials are incorrect. Please try again'], $e->getCode());
             }
         }
+    }
+
+    public function register(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'name' => 'required|min:4',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => [
+                'field' => $validator->errors()->keys()[0],
+                'message' => $validator->errors()->first()
+            ]
+            ], 400);
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => \Hash::make($request->password)
+        ]);
+
+        if ($user) {
+            return response()->json(['message' => 'The user is created.'], 201);
+        }
+    }
+
+    public function logout() {
+        auth()->user()->tokens->each(function (Token $token, $key) {
+           $token->delete();
+        });
+        return response()->json(['message' => 'Logged out successfully.'], 200);
     }
 }
