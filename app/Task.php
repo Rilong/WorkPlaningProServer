@@ -13,6 +13,14 @@ class Task extends Model
         return $this->hasOne('App\Project', 'id', 'project_id');
     }
 
+    public function tasks() {
+        return $this->hasMany('App\Task', 'parent_id');
+    }
+
+    public function task() {
+        return $this->hasOne('App\Task', 'id', 'parent_id');
+    }
+
     public static function add(array $fields)
     {
         $new_task = new static();
