@@ -9,6 +9,14 @@ class Project extends Model
 {
     public $fillable = ['name', 'budget', 'start_date', 'finish_date', 'finished_date'];
 
+    public function tasks() {
+        return $this->hasMany('App\Task', 'project_id');
+    }
+
+    public function notes() {
+        return $this->hasMany('App\Note', 'project_id');
+    }
+
     public static function add(array $fields)
     {
         $new_project = new static();
