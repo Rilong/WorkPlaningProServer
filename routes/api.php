@@ -20,3 +20,7 @@ Route::middleware('auth:api')->post('/logout', 'AuthController@logout')->name('a
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:api')->get('user', 'UserController@show');
+Route::middleware('auth:api')->put('user', 'UserController@update');
+Route::middleware('auth:api')->delete('user', 'UserController@destroy');
