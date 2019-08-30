@@ -55,8 +55,7 @@ class UserController extends Controller
     public function destroy()
     {
         $user = auth()->user();
-        DB::delete("DELETE FROM `oauth_access_tokens` WHERE `oauth_access_tokens`.`user_id` = ?", [$user->id]);
-        $user->delete();
+        $user->remove();
         return response()->json(['message' => 'The user deleted.'], 200);
     }
 }

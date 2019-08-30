@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -37,4 +38,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function users() {
+        return $this->hasMany('App\Task', 'user_id');
+    }
+
+    public function remove() {
+        DB::delete("DELETE FROM `oauth_access_tokens` WHERE `oauth_access_tokens`.`user_id` = ?", [$this->id]);
+        $this->delete();
+    }
 }
