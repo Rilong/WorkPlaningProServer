@@ -43,6 +43,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Task', 'user_id');
     }
 
+    public function projects() {
+        return $this->hasMany('App\Project', 'user_id');
+    }
+
+    public function project() {
+        return $this->hasOne('App\Project', 'user_id');
+    }
+
     public function remove() {
         DB::delete("DELETE FROM `oauth_access_tokens` WHERE `oauth_access_tokens`.`user_id` = ?", [$this->id]);
         $this->delete();

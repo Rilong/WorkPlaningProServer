@@ -17,10 +17,11 @@ class Project extends Model
         return $this->hasMany('App\Note', 'project_id');
     }
 
-    public static function add(array $fields)
+    public static function add(array $fields, int $user_id) : Project
     {
         $new_project = new static();
         $new_project->fill($fields);
+        $new_project->user_id = $user_id;
         $new_project->start_date = Carbon::now();
         $new_project->save();
         return $new_project;
