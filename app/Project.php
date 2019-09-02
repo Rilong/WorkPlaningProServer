@@ -21,7 +21,7 @@ class Project extends Model
     {
         $new_project = new static();
         $new_project->fill($fields);
-        $new_project->start_date = Carbon::now()->timestamp;
+        $new_project->start_date = Carbon::now();
         $new_project->save();
         return $new_project;
     }
@@ -51,7 +51,7 @@ class Project extends Model
 
     public function finish()
     {
-        $this->finished_date = Carbon::now()->timestamp;
+        $this->finished_date = Carbon::now();
         return $this->save();
     }
 }
