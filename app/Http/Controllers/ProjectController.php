@@ -27,7 +27,7 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         if (strlen(trim($request->get('name'))) === 0) {
-            return response()->json('The field name is empty', 400);
+            return response()->json('The field name is empty.', 400);
         }
 
         $project = Project::add(['name' => $request->get('name')]);
@@ -38,45 +38,52 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $project_id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($project_id)
     {
-        //
+        $project = auth()->user()->project()->find($project_id);
+        if ($project) {
+            return response()->json($project);
+        }
+        return response()->json('Project not found.', 404);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  int  $project_id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $project_id)
     {
-        //
+        $project = auth()->user()->project()->find($project_id);
+
+        if ($project) {
+            $project->fill($request->all());
+            $project->update();
+            return response()->json('project changed.');
+        }
+        return response()->json('Project not found.', 404);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int  $project_id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($project_id)
     {
-        //
+        $project = auth()->user()->project()->find($project_id);
+
+        if ($project) {
+            $project->remove();
+            return response()->json('project deleted.');
+        }
+        return response()->json('Project not found.', 404);
     }
 }
