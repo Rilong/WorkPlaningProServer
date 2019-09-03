@@ -9,21 +9,27 @@ class Project extends Model
 {
     public $fillable = ['name', 'budget', 'start_date', 'finish_date', 'finished_date'];
 
-    public function tasks() {
+    public function tasks()
+    {
         return $this->hasMany('App\Task', 'project_id');
     }
 
-    public function notes() {
+    public function notes()
+    {
         return $this->hasMany('App\Note', 'project_id');
     }
 
-    public static function add(array $fields, int $user_id) : Project
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    public static function add(array $fields)
     {
         $new_project = new static();
-        $new_project->fill($fields);
-        $new_project->user_id = $user_id;
+        $new_project->budget = 0;
         $new_project->start_date = Carbon::now();
-        $new_project->save();
+        $new_project->fill($fields);
         return $new_project;
     }
 

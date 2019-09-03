@@ -30,7 +30,8 @@ class ProjectController extends Controller
             return response()->json('The field name is empty', 400);
         }
 
-        $project = Project::add(['name' => $request->get('name'), 'budget' => 0], auth()->id());
+        $project = Project::add(['name' => $request->get('name')]);
+        auth()->user()->projects()->save($project);
         return response()->json($project, 201);
     }
 
