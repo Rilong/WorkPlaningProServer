@@ -19,7 +19,6 @@ class CreateProjectsTable extends Migration
             $table->float('budget');
             $table->integer('user_id')->unsigned();
             $table->timestamp('start_date');
-            $table->timestamp('finish_date')->nullable();
             $table->timestamp('finished_date')->nullable();
             $table->timestamps();
         });
