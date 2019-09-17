@@ -21,8 +21,13 @@ Route::middleware('auth:api')->get('/user', 'UserController@show');
 Route::middleware('auth:api')->put('/user', 'UserController@update');
 Route::middleware('auth:api')->delete('/user', 'UserController@destroy');
 
-Route::middleware('auth:api')->get('/projects', 'ProjectController@index');
-Route::middleware('auth:api')->get('/projects/{id}', 'ProjectController@show');
-Route::middleware('auth:api')->post('/projects', 'ProjectController@store');
-Route::middleware('auth:api')->put('/projects/{id}', 'ProjectController@update');
-Route::middleware('auth:api')->delete('/projects/{id}', 'ProjectController@destroy');
+Route::middleware('auth:api')->prefix('/projects')->group(function () {
+    Route::get('/all', 'ProjectController@indexWithModels');
+
+    Route::get('/', 'ProjectController@index');
+    Route::get('/{id}', 'ProjectController@show');
+    Route::post('/', 'ProjectController@store');
+    Route::put('/{id}', 'ProjectController@update');
+    Route::delete('/{id}', 'ProjectController@destroy');
+
+});

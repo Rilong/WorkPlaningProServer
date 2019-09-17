@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Project;
+use App\Repositories\ProjectRepository;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -85,5 +86,10 @@ class ProjectController extends Controller
             return response()->json('project deleted.');
         }
         return response()->json('Project not found.', 404);
+    }
+
+    public function indexWithModels(ProjectRepository $projectRepository) {
+        $projects = $projectRepository->all();
+        return response()->json($projects);
     }
 }
