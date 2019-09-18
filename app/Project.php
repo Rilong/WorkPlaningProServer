@@ -41,7 +41,10 @@ class Project extends Model
 
     public function remove()
     {
-         return $this->delete();
+        $this->tasks()->delete();
+        $this->notes()->delete();
+
+        return $this->delete();
     }
 
     public function setBudget(float $budget)
