@@ -30,4 +30,10 @@ Route::middleware('auth:api')->prefix('/projects')->group(function () {
     Route::put('/{id}', 'ProjectController@update');
     Route::delete('/{id}', 'ProjectController@destroy');
 
+    Route::get('/{project_id}/tasks', 'TaskController@index');
+    Route::get('/{project_id}/tasks/{id}', 'TaskController@show');
+    Route::post('/{project_id}/tasks', 'TaskController@store');
+    Route::put('/{project_id}/tasks/{id}', 'TaskController@update');
+    Route::delete('/{project_id}/tasks/{id}', 'TaskController@destroy');
+
 });

@@ -21,17 +21,17 @@ class Task extends Model
         return $this->hasOne('App\Task', 'id', 'parent_id');
     }
 
-    public static function add(array $fields)
+    public static function add(array $fields, $is_save = true)
     {
         $new_task = new static();
         $new_task->fill($fields);
-        return $new_task->save();
+        return $is_save ?  $new_task->save() : $new_task;
     }
 
     public function change(array $fields)
     {
         $this->fill($fields);
-        return $this->save();
+        return $this->update();
     }
 
     public function remove()
@@ -41,12 +41,12 @@ class Task extends Model
 
     public function check() {
         $this->is_done = true;
-        return $this->save();
+        return $this->update();
     }
 
     public function uncheck() {
         $this->is_done = false;
-        return $this->save();
+        return $this->update();
     }
 
     public function toggleCheck() {
