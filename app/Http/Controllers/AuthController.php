@@ -37,8 +37,7 @@ class AuthController extends Controller
         $validator = \Validator::make($request->all(), [
             'name' => 'required|min:4',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-            'password_confirmation' => 'required'
+            'password' => 'required|min:6',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => [
