@@ -25,9 +25,9 @@ class AuthController extends Controller
             return $response->getBody();
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             if ($e->getCode() == 400) {
-                return response()->json(['error' => 'Your request are invalid. Please enter a username or a password'], $e->getCode());
+                return response()->json('Your request are invalid. Please enter a username or a password', $e->getCode());
             } elseif ($e->getCode() == 401) {
-                return response()->json(['error' => 'Your credentials are incorrect. Please try again'], $e->getCode());
+                return response()->json('Your credentials are incorrect. Please try again', $e->getCode());
             }
         }
     }
@@ -40,10 +40,9 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error' => [
+            return response()->json([
                 'field' => $validator->errors()->keys()[0],
                 'message' => $validator->errors()->first()
-            ]
             ], 400);
         }
 
