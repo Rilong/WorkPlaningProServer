@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             \App\Http\Middleware\Json::class,
+            \App\Http\Middleware\TokenExpires::class,
             'throttle:60,1',
             'bindings',
         ],

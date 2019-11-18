@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Passport\Token;
 
@@ -12,7 +13,18 @@ class AuthController extends Controller
     {
         if (\Auth::guard('web')->attempt($request->all())) {
             $user = User::where(['email' => $request->email])->first();
-            return response()->json($user->createToken('Personal Access Token')->accessToken);
+            $tokenResult = $user->createToken('Personal Access Token');
+            $token = $tokenResult->token;
+            $token->expires_at = Carbon::now()->addDays(20);
+            $token->save();
+            return response()->json([
+                'token' => $tokenResult->accessToken,
+                'user'  => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email
+                ]
+            ]);
         } else {
             return response()->json('Your request are invalid. Please enter a username or a password', 401);
         }
