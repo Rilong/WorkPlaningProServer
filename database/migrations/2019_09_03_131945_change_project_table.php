@@ -14,7 +14,7 @@ class ChangeProjectTable extends Migration
     public function up()
     {
         Schema::table('Projects', function (Blueprint $table) {
-            $table->date('dateline_date')->after('start_date')->nullable();
+            $table->date('deadline_date')->after('start_date')->nullable();
         });
     }
 
