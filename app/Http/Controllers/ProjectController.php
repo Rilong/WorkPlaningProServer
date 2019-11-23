@@ -92,4 +92,14 @@ class ProjectController extends Controller
         $projects = $projectRepository->all();
         return response()->json($projects);
     }
+
+    public function showWithModels($project_id) {
+        $project = auth()->user()->project()->find($project_id);
+        $tasks = $project->tasks;
+        unset($project['tasks']);
+        return response()->json([
+            'project' => $project,
+            'task' => $tasks
+        ]);
+    }
 }

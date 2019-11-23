@@ -23,6 +23,7 @@ Route::middleware('auth:api')->delete('/user', 'UserController@destroy');
 
 Route::middleware('auth:api')->prefix('/projects')->group(function () {
     Route::get('/all', 'ProjectController@indexWithModels');
+    Route::get('/{id}/all', 'ProjectController@showWithModels');
 
     Route::get('/', 'ProjectController@index');
     Route::get('/{id}', 'ProjectController@show');
