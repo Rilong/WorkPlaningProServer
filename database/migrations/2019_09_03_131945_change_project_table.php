@@ -26,7 +26,7 @@ class ChangeProjectTable extends Migration
     public function down()
     {
         Schema::table('projects', function (Blueprint $table) {
-            $table->dropColumn('dateline_date');
+            $table->dropColumn('deadline_date');
         });
     }
 }
