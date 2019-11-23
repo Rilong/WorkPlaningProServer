@@ -99,7 +99,7 @@ class ProjectController extends Controller
         unset($project['tasks']);
         return response()->json([
             'project' => $project,
-            'task' => $tasks
+            'tasks' => $tasks
         ]);
     }
 }
