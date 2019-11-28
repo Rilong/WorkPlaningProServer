@@ -39,7 +39,7 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @param string $project_id
      * @return \Illuminate\Http\Response
      */
@@ -58,7 +58,7 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      *jj
-     * @param  int  $id
+     * @param int $id
      * @param string $project_id
      * @return \Illuminate\Http\Response
      */
@@ -81,9 +81,9 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @param  int  $project_id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @param int $project_id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $project_id, $id)
@@ -103,11 +103,29 @@ class TaskController extends Controller
         }
     }
 
+    public function checkToggle(Request $request, $project_id, $id)
+    {
+        $project = Project::find($project_id);
+
+        if ($project->user_id === auth()->id()) {
+            $task = $project->tasks()->find($id);
+            $check = $request->check;
+            if ($check) {
+                $task->check();
+                return response()->json('The task checked.', 200);
+            } else {
+                $task->uncheck();
+                return response()->json('The task unchecked.', 200);
+            }
+        }
+        return response()->json('Task not found.', 404);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @param  int  $project_id
+     * @param int $id
+     * @param int $project_id
      * @return \Illuminate\Http\Response
      */
     public function destroy($project_id, $id)

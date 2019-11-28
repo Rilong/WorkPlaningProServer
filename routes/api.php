@@ -35,6 +35,7 @@ Route::middleware('auth:api')->prefix('/projects')->group(function () {
     Route::get('/{project_id}/tasks/{id}', 'TaskController@show');
     Route::post('/{project_id}/tasks', 'TaskController@store');
     Route::put('/{project_id}/tasks/{id}', 'TaskController@update');
+    Route::put('/{project_id}/tasks/{id}/toggleCheck', 'TaskController@checkToggle');
     Route::delete('/{project_id}/tasks/{id}', 'TaskController@destroy');
 
 });
