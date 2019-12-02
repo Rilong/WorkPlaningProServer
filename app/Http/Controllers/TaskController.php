@@ -48,8 +48,8 @@ class TaskController extends Controller
         $project = Project::find($project_id);
 
         if ($project->user_id === auth()->id()) {
-            $project->tasks()->save(Task::add($request->all(), false));
-            return response()->json('The task was created.', 201);
+            $task = $project->tasks()->save(Task::add($request->all(), false));
+            return response()->json($task->id, 201);
         } else {
             return response()->json('Task not found.', 404);
         }
