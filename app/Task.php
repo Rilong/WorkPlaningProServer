@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
@@ -41,11 +42,13 @@ class Task extends Model
 
     public function check() {
         $this->is_done = true;
+        $this->finished_date = Carbon::now()->hours(0)->minutes(0)->seconds(0);
         return $this->update();
     }
 
     public function uncheck() {
         $this->is_done = false;
+        $this->finished_date = null;
         return $this->update();
     }
 
