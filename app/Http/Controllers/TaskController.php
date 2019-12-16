@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Project;
 use App\Repositories\TaskRepository;
 use App\Task;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -143,5 +144,22 @@ class TaskController extends Controller
         } else {
             return response()->json('Task not found.', 404);
         }
+    }
+
+    public function indexWithModels($id, Request $request) {
+
+        if ($id == auth()->id()) {
+            $tasks = Task::with('project')->where('user_id', $id);
+            if ($request->has('date')) {
+                $date = new Carbon($request->date);
+                $start = $date->clone()->startOfMonth()->startOfWeek(Carbon::MONDAY);
+                $end = $date->clone()->endOfMonth()->endOfWeek(Carbon::MONDAY);
+
+                $tasks->whereBetween('deadline_date', [$start, $end]);
+            }
+            return response()->json($tasks->get());
+        }
+
+        return response()->json('Tasks not found.', 404);
     }
 }
