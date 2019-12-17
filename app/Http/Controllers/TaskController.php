@@ -151,7 +151,7 @@ class TaskController extends Controller
         if ($id == auth()->id()) {
             $tasks = Task::with('project')->where('user_id', $id);
             if ($request->has('date')) {
-                $date = new Carbon($request->date);
+                $date = new Carbon(urldecode($request->date));
                 $start = $date->clone()->startOfMonth()->startOfWeek(Carbon::MONDAY);
                 $end = $date->clone()->endOfMonth()->endOfWeek(Carbon::MONDAY);
 
