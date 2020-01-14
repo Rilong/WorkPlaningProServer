@@ -8,6 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     public $fillable = ['name', 'description', 'budget', 'start_date', 'deadline_date', 'finished_date'];
+    public $appends  = ['percent'];
+
+    public function getPercentAttribute() {
+        $done    = 0;
+        $percent = 0;
+
+        if ($this->relationLoaded('tasks') && count($this->tasks) > 0) {
+            foreach ($this->tasks as $task) {
+                if ($task->is_done === 1) {
+                    $done++;
+                }
+            }
+            $total = count($this->tasks);
+            $percent = ceil(100 * $done / $total);
+        }
+        return $percent;
+    }
 
     public function tasks()
     {

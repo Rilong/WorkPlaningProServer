@@ -14,15 +14,32 @@ class ProjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(auth()->user()->projects);
+        $isTasks = false;
+
+        $allProjects = auth()->user()->projects();
+
+        if ($request->has('tasks') && $request->get('tasks') == 1){
+            $isTasks = true;
+            $allProjects->with('tasks');
+        }
+
+        $allProjects = $allProjects->get()->toArray();
+
+        if ($isTasks) {
+            $allProjects = array_map(function ($arr) {
+                unset($arr['tasks']);
+                return $arr;
+            }, $allProjects);
+        }
+        return response()->json($allProjects);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -39,7 +56,7 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $project_id
+     * @param int $project_id
      * @return \Illuminate\Http\Response
      */
     public function show($project_id)
@@ -55,8 +72,8 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $project_id
+     * @param \Illuminate\Http\Request $request
+     * @param int $project_id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $project_id)
@@ -74,7 +91,7 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $project_id
+     * @param int $project_id
      * @return \Illuminate\Http\Response
      */
     public function destroy($project_id)
@@ -88,12 +105,14 @@ class ProjectController extends Controller
         return response()->json('Project not found.', 404);
     }
 
-    public function indexWithModels(ProjectRepository $projectRepository) {
+    public function indexWithModels(ProjectRepository $projectRepository)
+    {
         $projects = $projectRepository->all();
         return response()->json($projects);
     }
 
-    public function showWithModels($project_id) {
+    public function showWithModels($project_id)
+    {
         $project = auth()->user()->project()->find($project_id);
         $tasks = $project->tasks;
         unset($project['tasks']);
