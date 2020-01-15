@@ -8,20 +8,8 @@ use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-
     public function testUserLogin()
     {
-        \App\User::create([
-            'name' => 'Roman',
-            'email' => 'romgnatyuk@gmail.com',
-            'password' => \Hash::make('123456')
-        ]);
-
         $response = $this->post('/api/login', [
             'email' => 'romgnatyuk@gmail.com',
             'password' => '123456'
