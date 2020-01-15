@@ -11,6 +11,7 @@ $factory->define(Task::class, function (Faker $faker) {
     return [
         'title' => $faker->text(20),
         'project_id' => 1,
+        'user_id' => 1,
         'deadline_date' => Carbon::now()->addDays(20)
     ];
 });

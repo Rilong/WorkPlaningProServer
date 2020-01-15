@@ -13,6 +13,6 @@ $factory->define(Project::class, function (Faker $faker) {
         'budget' => round($faker->numberBetween(5000, 15000), -3),
         'user_id' => 1,
         'start_date' => Carbon::now(),
-        'dateline_date' => Carbon::now()->addMonth()
+        'deadline_date' => Carbon::now()->addMonth()
     ];
 });
