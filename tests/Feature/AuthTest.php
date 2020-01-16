@@ -33,6 +33,9 @@ class AuthTest extends TestCase
         $user = Passport::actingAs(factory(User::class)->create());
         $response = $this->actingAs($user)->post('/api/logout');
 
+        $response->assertJson([
+            'message' => 'Logged out successfully.'
+        ]);
         $response->assertStatus(200);
     }
 }
