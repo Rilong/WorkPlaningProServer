@@ -21,6 +21,10 @@ class RegisterTest extends TestCase
             'password' => '123456'
         ]);
 
+
+        $response->assertJson([
+            'message' => 'The user is created.'
+        ]);
         $response->assertStatus(201);
     }
 
