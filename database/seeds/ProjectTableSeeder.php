@@ -14,5 +14,8 @@ class ProjectTableSeeder extends Seeder
     {
         Project::truncate();
         factory(Project::class, 3)->create();
+        factory(Project::class, 3)->create([
+            'user_id' => 3
+        ]);
     }
 }
