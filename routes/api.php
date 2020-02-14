@@ -31,12 +31,11 @@ Route::middleware('auth:api')->prefix('/projects')->group(function () {
     Route::post('/', 'ProjectController@store');
     Route::put('/{id}', 'ProjectController@update');
     Route::delete('/{id}', 'ProjectController@destroy');
-
-    Route::get('/{project_id}/tasks', 'TaskController@index');
-    Route::get('/{project_id}/tasks/{id}', 'TaskController@show');
-    Route::post('/{project_id}/tasks', 'TaskController@store');
-    Route::put('/{project_id}/tasks/{id}', 'TaskController@update');
-    Route::put('/{project_id}/tasks/{id}/toggleCheck', 'TaskController@checkToggle');
-    Route::delete('/{project_id}/tasks/{id}', 'TaskController@destroy');
-
 });
+
+Route::middleware('auth:api')->get('/tasks', 'TaskController@index');
+Route::middleware('auth:api')->get('/tasks/{id}', 'TaskController@show');
+Route::middleware('auth:api')->post('/tasks', 'TaskController@store');
+Route::middleware('auth:api')->put('/tasks/{id}', 'TaskController@update');
+Route::middleware('auth:api')->post('/tasks/{id}/check', 'TaskController@check');
+Route::middleware('auth:api')->delete('/tasks/{id}', 'TaskController@destroy');

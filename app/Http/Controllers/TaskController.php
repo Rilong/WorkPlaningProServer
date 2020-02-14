@@ -12,16 +12,35 @@ class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * @param string $project_id
+     * @param Request $request
      * @param TaskRepository $taskRepository
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index($project_id, TaskRepository $taskRepository)
+    public function index(Request $request, TaskRepository $taskRepository)
     {
-        $project = Project::find($project_id);
+        $paramsKeys = ['project_id', 'date', 'date_month'];
+        $user_id = auth()->user()->id;
+        if (count($request->all()) === 0) {
+            return response()->json($taskRepository->allByUser($user_id), 200);
 
-        if ($project->user_id === auth()->id()) {
-            return response()->json($taskRepository->all($project_id));
+        } elseif (count($request->all()) === 1) {
+            if ($request->has($paramsKeys[0])) {
+                $project_id = $request->get($paramsKeys[0]);
+                $project = Project::find($project_id);
+
+                if ($project->user_id !== $user_id) {
+                    return response()->json('Access denied.', 400);
+                }
+                return response()->json($taskRepository->allByProject($project_id, $user_id));
+            }
+
+            if ($request->has($paramsKeys[1])) {
+                return response()->json($taskRepository->allByDate($request->get($paramsKeys[1]), $user_id));
+            }
+
+            if ($request->has($paramsKeys[2])) {
+                return response()->json($taskRepository->allByMonth($request->get($paramsKeys[2]), $user_id));
+            }
         } else {
             return response()->json('Access denied.', 400);
         }
@@ -42,17 +61,23 @@ class TaskController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param string $project_id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $project_id)
+    public function store(Request $request)
     {
-        $project = Project::find($project_id);
-
-        if ($project->user_id === auth()->id()) {
-            $task = $project->tasks()->save(Task::add($request->all(), false));
+        if (count($request->all()) === 1) {
+            $task = Task::create(array_merge($request->all(), ['user_id' => auth()->id()]));
             return response()->json($task, 201);
         } else {
-            return response()->json('Task not found.', 404);
+            if (count($request->all()) === 2 && $request->has('project_id')) {
+                $task = Task::create(array_merge($request->all(), [
+                    'user_id' => auth()->id(),
+                    'project_id' => $request->get('project_id')
+                ]));
+                return response()->json($task, 201);
+            } else {
+                return response()->json('Access denied.', 400);
+            }
         }
     }
 
@@ -60,20 +85,15 @@ class TaskController extends Controller
      * Display the specified resource.
      *jj
      * @param int $id
-     * @param string $project_id
-     * @return \Illuminate\Http\Response
+     * @param TaskRepository $taskRepository
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($project_id, $id)
+    public function show($id, TaskRepository $taskRepository)
     {
-        $project = Project::find($project_id);
+        $task = $taskRepository->getById($id);
 
-        if ($project->user_id === auth()->id()) {
-            $task = $project->tasks()->find($id);
-            if ($task) {
-                return response()->json($task, 200);
-            } else {
-                return response()->json('Task not found.', 404);
-            }
+        if ($task && $task->user_id === auth()->id()) {
+            return response()->json($task, 200);
         } else {
             return response()->json('Task not found.', 404);
         }
@@ -84,34 +104,26 @@ class TaskController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @param int $project_id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $project_id, $id)
+    public function update(Request $request, $id)
     {
-        $project = Project::find($project_id);
+        $task = Task::find($id);
 
-        if ($project->user_id === auth()->id()) {
-            $task = $project->tasks()->find($id);
-            if ($task) {
-                $task->change($request->all());
-                return response()->json('The task was updated.', 200);
-            } else {
-                return response()->json('Task not found.', 404);
-            }
+        if ($task && $task->user_id === auth()->id()) {
+            $task->change($request->all());
+            return response()->json('The task was updated.', 200);
         } else {
             return response()->json('Task not found.', 404);
         }
     }
 
-    public function checkToggle(Request $request, $project_id, $id)
+    public function check($id)
     {
-        $project = Project::find($project_id);
+        $task = Task::find($id);
 
-        if ($project->user_id === auth()->id()) {
-            $task = $project->tasks()->find($id);
-            $check = $request->check;
-            if ($check) {
+        if ($task && $task->user_id === auth()->id()) {
+            if (!$task->is_done) {
                 $task->check();
                 return response()->json('The task checked.', 200);
             } else {
@@ -129,40 +141,14 @@ class TaskController extends Controller
      * @param int $project_id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($project_id, $id)
+    public function destroy($id)
     {
-        $project = Project::find($project_id);
-
-        if ($project->user_id === auth()->id()) {
-            $task = $project->tasks()->find($id);
-            if ($task) {
-                $task->remove();
-                return response()->json('The task was deleted.', 200);
-            } else {
-                return response()->json('Task not found.', 404);
-            }
+        $task = Task::find($id);
+        if ($task && $task->user_id === auth()->id()) {
+            $task->remove();
+            return response()->json('The task was deleted.', 200);
         } else {
             return response()->json('Task not found.', 404);
         }
-    }
-
-    public function indexWithModels($id, Request $request) {
-
-        if ($id == auth()->id()) {
-            $tasks = Task::with('project')->where('user_id', $id);
-            if ($request->has('date_month')) {
-                $date = new Carbon(urldecode($request->date_month));
-                $start = $date->clone()->startOfMonth()->startOfWeek(Carbon::MONDAY);
-                $end = $date->clone()->endOfMonth()->endOfWeek(Carbon::MONDAY);
-
-                $tasks->whereBetween('deadline_date', [$start, $end]);
-            } elseif ($request->has('date')) {
-                $date = new Carbon(urldecode($request->date));
-                $tasks->where(['deadline_date' => $date]);
-            }
-            return response()->json($tasks->get());
-        }
-
-        return response()->json('Tasks not found.', 404);
     }
 }
