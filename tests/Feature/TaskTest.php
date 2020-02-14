@@ -10,7 +10,8 @@ class TaskTest extends TestCase
 {
     public function testIndexAvailable()
     {
-        $response = $this->get('/api/tasks');
+        $user_id = 1;
+        $response = $this->actingAs(User::find($user_id))->get('/api/tasks');
         $response->assertStatus(200);
     }
 
@@ -79,8 +80,8 @@ class TaskTest extends TestCase
         $response = $this->actingAs(User::find($user_id))->get("/api/tasks?date_month=" . urlencode($date));
         $response->assertStatus(200);
         $response->assertJson([
-            ['deadline_date' => '2020-02-01'],
-            ['deadline_date' => '2020-03-01']
+            ['deadline_date' => '2020-02-01 00:00:00'],
+            ['deadline_date' => '2020-03-01 00:00:00']
         ]);
     }
 
@@ -107,14 +108,30 @@ class TaskTest extends TestCase
     {
         $user_id = 1;
         $response = $this->actingAs(User::find($user_id))->post('/api/tasks', [
-            'title' => 'Test 2',
-            'user_id' => $user_id
+            'title' => 'Test 2'
         ]);
 
         $data = $response->json();
         $task = Task::find($data['id']);
         $response->assertStatus(201);
         $this->assertNotNull($task);
+        $this->assertEquals($user_id, $data['user_id']);
+    }
+
+    public function testStoreTaskInProject() {
+        $user_id = 1;
+        $project_id = 2;
+        $response = $this->actingAs(User::find($user_id))->post("/api/tasks", [
+            'title' => 'Test 2',
+            'project_id' => $project_id
+        ]);
+
+        $data = $response->json();
+        $task = Task::find($data['id']);
+        $response->assertStatus(201);
+        $this->assertNotNull($task);
+        $this->assertEquals($user_id, $data['user_id']);
+        $this->assertEquals($project_id, $data['project_id']);
     }
 
     public function testUpdateTask()
@@ -125,12 +142,10 @@ class TaskTest extends TestCase
             'title' => 'Test 2 updated',
         ]);
 
+        $task = Task::find($task_id)->toArray();
         $response->assertStatus(200);
         $response->assertSee('The task was updated');
-
-        $data = $response->json();
-        $task = Task::find($data['id']);
-        $this->assertEquals($task['title'], 'Test 2 updated');
+        $this->assertEquals('Test 2 updated', $task['title']);
     }
 
     public function testUpdateTaskFailed()
@@ -142,13 +157,13 @@ class TaskTest extends TestCase
         ]);
 
         $response->assertStatus(404);
-        $response->assertStatus('Task not found.');
+        $response->assertSee('Task not found.');
     }
 
     public function testTaskCheck()
     {
         $user_id = 1;
-        $task_id = 1;
+        $task_id = 2;
         $task1 = Task::find($task_id);
         $response = $this->actingAs(User::find($user_id))->post("/api/tasks/$task_id/check");
         $task2 = Task::find($task_id);
@@ -163,7 +178,7 @@ class TaskTest extends TestCase
         $task_id = 1000;
         $response = $this->actingAs(User::find($user_id))->post("/api/tasks/$task_id/check");
         $response->assertStatus(404);
-        $response->assertStatus('Task not found.');
+        $response->assertSee('Task not found.');
     }
 
     public function testTaskDestroy()
@@ -184,6 +199,6 @@ class TaskTest extends TestCase
 
         $response = $this->actingAs(User::find($user_id))->delete("/api/tasks/$task_id");
         $response->assertStatus(404);
-        $response->assertStatus('Task not found.');
+        $response->assertSee('Task not found.');
     }
 }

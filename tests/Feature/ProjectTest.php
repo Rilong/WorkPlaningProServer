@@ -42,7 +42,7 @@ class ProjectTest extends TestCase
         $response->assertJson([
             [
                 'id' => 1,
-                'percent' => 20
+                'percent' => 34
             ]
         ]);
         $response->assertStatus(200);
