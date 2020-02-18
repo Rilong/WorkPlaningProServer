@@ -65,11 +65,11 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        if (count($request->all()) === 1) {
+        if ($request->has('title')) {
             $task = Task::create(array_merge($request->all(), ['user_id' => auth()->id()]));
             return response()->json($task, 201);
         } else {
-            if (count($request->all()) === 2 && $request->has('project_id')) {
+            if ($request->has('title') && $request->has('project_id')) {
                 $task = Task::create(array_merge($request->all(), [
                     'user_id' => auth()->id(),
                     'project_id' => $request->get('project_id')
