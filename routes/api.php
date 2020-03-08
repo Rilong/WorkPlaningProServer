@@ -22,6 +22,9 @@ Route::middleware('auth:api')->get('/user/{id}/tasks', 'TaskController@indexWith
 Route::middleware('auth:api')->put('/user', 'UserController@update');
 Route::middleware('auth:api')->delete('/user', 'UserController@destroy');
 
+Route::middleware('auth:api')->post('/user/settings', 'UserController@settingsUpdateOrDestroy');
+Route::middleware('auth:api')->put('/user/settings', 'UserController@settingsUpdateOrDestroy');
+
 Route::middleware('auth:api')->prefix('/projects')->group(function () {
     Route::get('/all', 'ProjectController@indexWithModels');
     Route::get('/{id}/all', 'ProjectController@showWithModels');

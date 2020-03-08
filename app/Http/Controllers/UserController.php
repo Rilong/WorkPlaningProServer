@@ -58,4 +58,23 @@ class UserController extends Controller
         $user->remove();
         return response()->json(['message' => 'The user deleted.'], 200);
     }
+
+    public function settingsUpdateOrDestroy(Request $request) {
+        if ($request->has('settings')) {
+            $settings = $request->get('settings');
+            $user = auth()->user();
+            if ($request->method() === 'POST') {
+                $user->changeSettings($settings);
+                return response()->json('Settings updated.');
+            } else {
+                $user->removeSettings($settings);
+                return response()->json('Settings removed.');
+            }
+        }
+        return response()->json('Bad Request.', 400);
+    }
+
+    public function settingsDestroy(Request $request) {
+
+    }
 }

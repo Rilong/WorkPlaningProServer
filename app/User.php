@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Casts\JsonCast;
 use DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -30,6 +31,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -37,6 +39,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'settings'          => 'array'
     ];
 
     public function users() {
@@ -49,6 +52,34 @@ class User extends Authenticatable
 
     public function project() {
         return $this->hasOne('App\Project', 'user_id');
+    }
+
+    public function changeSettings(array $settings, bool $save = true)
+    {
+        if (!is_array($this->settings)) {
+            $this->settings = [];
+        }
+
+        $this->settings = array_merge($this->settings, $settings);
+
+        if ($save) {
+            $this->save();
+        }
+    }
+
+    public function removeSettings(array $settings, bool $save = true) {
+        $settingsList = $this->settings;
+        if (count($settings) > 0) {
+            foreach ($settings as $key => $value) {
+                if (array_key_exists($key, $this->settings)) {
+                    unset($settingsList[$key]);
+                }
+            }
+            $this->settings = $settingsList;
+            if ($save) {
+                $this->save();
+            }
+        }
     }
 
     public function remove() {
