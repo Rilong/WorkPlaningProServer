@@ -14,7 +14,7 @@ class AddSettingsFieldToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->text('settings')->after('remember_token');
+            $table->text('settings')->nullable()->after('remember_token');
         });
     }
 
