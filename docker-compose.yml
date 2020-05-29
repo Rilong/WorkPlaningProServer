@@ -1,19 +1,22 @@
 version: '3.6'
+volumes:
+  db_data:
+  vendor:
 services:
   php:
-    build: ./docker/php
+    build: .
     volumes:
-      - ./:/var/www/html
       - ./docker/php/config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
     ports:
       - 80:80
   db:
     image: mysql:5.7.26
     environment:
       MYSQL_ROOT_PASSWORD: 123
-    command: --innodb_use_native_aio=0
     volumes:
-      - ./docker/mysql/data:/var/lib/mysql
+      - db_data:/var/lib/mysql
     ports:
       - 3306:3306
   pma:
